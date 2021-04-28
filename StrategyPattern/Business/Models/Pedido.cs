@@ -1,4 +1,5 @@
-﻿using StrategyPattern.Business.Strategies.Imposto;
+﻿using StrategyPattern.Business.Strategies.Fatura;
+using StrategyPattern.Business.Strategies.Imposto;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,14 +21,19 @@ namespace StrategyPattern.Business.Models
 
         // Implementação Strategy
         public IImpostoStrategy ImpostoStrategy { get; set; }
-        public decimal GetTaxa()
+
+        public IFatura Fatura { get; set; }
+
+        public decimal GetTaxa(IImpostoStrategy impostoStrategy = default)
         {
             // Com Strategy
-            if (ImpostoStrategy == null)
+            var strategy = impostoStrategy ?? ImpostoStrategy;
+
+            if (strategy == null)
             {
                 return 0m;
             }
-            return ImpostoStrategy.GetTaxaPara(this);
+            return strategy.GetTaxaPara(this);
 
 
 
@@ -89,6 +95,22 @@ namespace StrategyPattern.Business.Models
             */
 
             //return 0;
+        }
+
+        public void FinalizarPedido()
+        {
+            if (PagamentosSelecionados.Any(x => x.ProvedorPagamento == ProvedorPagamento.Fatura) && 
+                QuantiaDevida > 0 && 
+                StatusEnvio == StatusEnvio.AguardandoPorPagamento)
+            {
+                Fatura.Gerador(this);
+
+                StatusEnvio = StatusEnvio.ProntoParaEnvio;
+            }
+            else if (QuantiaDevida > 0)
+            {
+                throw new Exception("Não foi possível finalizar o pedido");
+            }
         }
 
     }

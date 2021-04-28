@@ -1,4 +1,5 @@
 ﻿using StrategyPattern.Business.Models;
+using StrategyPattern.Business.Strategies.Fatura;
 using StrategyPattern.Business.Strategies.Imposto;
 using System;
 
@@ -6,6 +7,10 @@ namespace StrategyPattern
 {
     class Program
     {
+        // implementando Strategy
+        // A idéia é desacoplae código por responsabilidade de função e manter um código mais limpo
+        // Poder fazer uso de testes unitários
+        // Definir strategy especifica de imposto para ter certesa que sempre quer criarmos o pedido definiremos a estrategia
         static void Main(string[] args)
         {
             var pedido = new Pedido
@@ -15,23 +20,19 @@ namespace StrategyPattern
                     PaisOrigem = "suécia",
                     PaisDestino = "suécia"
                 }
+
             };
 
-            // implementando Strategy
-            // Definir strategy especifica de imposto para ter certesa que sempre quer criarmos o pedido definiremos a estrategia
-            var destino = pedido.DetalhesEnvio.PaisDestino.ToLowerInvariant();
-            if (destino == "suécia")
-            {
-                pedido.ImpostoStrategy = new SueciaImpostoStrategy();
-            }
-            else if(destino == "us")
-            {
-                pedido.ImpostoStrategy = new USAImpostoStrategy();
-            }
 
-
-
-
+            //var destino = pedido.DetalhesEnvio.PaisDestino.ToLowerInvariant();
+            //if (destino == "suécia")
+            //{
+            //    pedido.ImpostoStrategy = new SueciaImpostoStrategy();
+            //}
+            //else if(destino == "us")
+            //{
+            //    pedido.ImpostoStrategy = new USAImpostoStrategy();
+            //}
 
 
             pedido.LineItems.Add(
@@ -48,7 +49,13 @@ namespace StrategyPattern
                         ItemType.Service),
                     1);
 
-            Console.WriteLine("Taxa: $"+ pedido.GetTaxa());
+            pedido.PagamentosSelecionados.Add(new Pagamento { ProvedorPagamento = ProvedorPagamento.Fatura });
+
+            Console.WriteLine("Taxa: $" + pedido.GetTaxa(new SueciaImpostoStrategy()));
+
+            //pedido.Fatura = new FileFatura();
+            pedido.Fatura = new EmailFatura();
+            pedido.FinalizarPedido();
             Console.ReadLine();
         }
     }

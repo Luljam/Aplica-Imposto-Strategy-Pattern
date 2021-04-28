@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using StrategyPattern.Business.Models;
+﻿using StrategyPattern.Business.Models;
 
 namespace StrategyPattern.Business.Strategies.Imposto
 {
